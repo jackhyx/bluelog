@@ -113,12 +113,19 @@ def show_post(post_id):
 
 
 @blog_bp.route('/reply/comment/<int:comment_id>')
+# 显示回复评论标记
+# 将接受的数据通过查询字符串传递给了需要评论的photo视图
 def reply_comment(comment_id):
     comment = Comment.query.get_or_404(comment_id)
     if not comment.post.can_comment:
         flash('Comment is disabled.', 'warning')
         return redirect(url_for('.show_post', post_id=comment.post.id))
     return redirect(
+        # 重定向到原来的文章界面
+        # reply 被回复的评论id
+        # author 被回复的评论的作者
+        # ”#comment-form“ 将页面焦点跳到评论表单的位置
+        # 任何多余的关键字参数都会被自动转换为查询字符串
         url_for('.show_post', post_id=comment.post_id, reply=comment_id, author=comment.author) + '#comment-form')
 
 

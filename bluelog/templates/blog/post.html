@@ -100,7 +100,7 @@
 
                                 <p class="mb-1">{{ comment.body }}</p>
                                 <div class="float-right">
-                                    <a class="btn btn-light btn-sm"
+                                    <a class="btn btn-light btn-sm" # 回复按钮
                                        href="{{ url_for('.reply_comment', comment_id=comment.id) }}">Reply</a>
                                     {% if current_user.is_authenticated %}
                                         <a class="btn btn-light btn-sm" href="mailto:{{ comment.email }}">Email</a>
@@ -126,7 +126,10 @@
             {% endif %}
             {% if request.args.get('reply') %}
                 <div class="alert alert-dark">
+                    # 回复提醒条，让用户知道自己现在处于回复状态
+                    # request.args 获取查询字符串传递的信息以及提示显示被回复的用户名称
                     Reply to <strong>{{ request.args.get('author') }}</strong>:
+                    # 取消按钮 重定向到原文章页面
                     <a class="float-right" href="{{ url_for('.show_post', post_id=post.id) }}">Cancel</a>
                 </div>
             {% endif %}
