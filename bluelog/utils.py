@@ -5,6 +5,7 @@
     :copyright: © 2018 Grey Li <withlihui@gmail.com>
     :license: MIT, see LICENSE for more details.
 """
+# 存储辅助函数
 try:
     from urlparse import urlparse, urljoin
 except ImportError:
@@ -12,12 +13,14 @@ except ImportError:
 
 from flask import request, redirect, url_for, current_app
 
+# 验证URL安全
 
 def is_safe_url(target):
     ref_url = urlparse(request.host_url)
     test_url = urlparse(urljoin(request.host_url, target))
     return test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc
 
+# 重定向
 
 def redirect_back(default='blog.index', **kwargs):
     for target in request.args.get('next'), request.referrer:

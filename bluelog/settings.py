@@ -7,7 +7,7 @@
 """
 import os
 import sys
-
+# 使用类 组织配置
 basedir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
 # SQLite URI compatible
@@ -17,7 +17,7 @@ if WIN:
 else:
     prefix = 'sqlite:////'
 
-
+# 基本配置类
 class BaseConfig(object):
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev key')
 
@@ -47,17 +47,18 @@ class BaseConfig(object):
     BLUELOG_UPLOAD_PATH = os.path.join(basedir, 'uploads')
     BLUELOG_ALLOWED_IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'gif']
 
-
+# 开发配置类
 class DevelopmentConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = prefix + os.path.join(basedir, 'data-dev.db')
 
-
+# 测试配置类
 class TestingConfig(BaseConfig):
     TESTING = True
     WTF_CSRF_ENABLED = False
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'  # in-memory database
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'  # in-memory database内存型
 
-
+# 生产配置类
+# 为了避免相互干扰 为不同使用场景设置不同的数据库URL
 class ProductionConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', prefix + os.path.join(basedir, 'data.db'))
 

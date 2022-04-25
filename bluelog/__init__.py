@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""111111
+"""
     :author: Grey Li (李辉)
     :url: http://greyli.com
     :copyright: © 2018 Grey Li <withlihui@gmail.com>
@@ -24,14 +24,15 @@ from bluelog.settings import config
 
 basedir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
-
+# 工厂函数 默认参数：为了支持Flask自动从FLASK_APP环境变量对应值指向的模块或包中发现工厂函数
 def create_app(config_name=None):
     if config_name is None:
         config_name = os.getenv('FLASK_CONFIG', 'development')
 
     app = Flask('bluelog')
-    app.config.from_object(config[config_name])
 
+    app.config.from_object(config[config_name])
+# 组织工厂函数
     register_logging(app)
     register_extensions(app)
     register_blueprints(app)
@@ -88,7 +89,9 @@ def register_extensions(app):
     toolbar.init_app(app)
     migrate.init_app(app, db)
 
-
+# 蓝本注册到程序实例上
+# url_prefix 为蓝本视图下的视图url前添加前缀 -> /auth/login
+# subdomain 为蓝本下的路由设置子域 subdomain = 'auth' -> auth.example.com/login
 def register_blueprints(app):
     app.register_blueprint(blog_bp)
     app.register_blueprint(admin_bp, url_prefix='/admin')
@@ -104,7 +107,7 @@ def register_shell_context(app):
 def register_template_context(app):
     @app.context_processor
     def make_template_context():
-        admin = Admin.query.first()
+        admin = Admin.query.first() #order_by() 排序
         categories = Category.query.order_by(Category.name).all()
         links = Link.query.order_by(Link.name).all()
         if current_user.is_authenticated:
@@ -132,6 +135,7 @@ def register_errors(app):
     @app.errorhandler(CSRFError)
     def handle_csrf_error(e):
         return render_template('errors/400.html', description=e.description), 400
+
 
 
 def register_commands(app):
@@ -182,6 +186,7 @@ def register_commands(app):
         db.session.commit()
         click.echo('Done.')
 
+    # 生成虚拟数据的命令
     @app.cli.command()
     @click.option('--category', default=10, help='Quantity of categories, default is 10.')
     @click.option('--post', default=50, help='Quantity of posts, default is 50.')
@@ -189,7 +194,7 @@ def register_commands(app):
     def forge(category, post, comment):
         """Generate fake data."""
         from bluelog.fakes import fake_admin, fake_categories, fake_posts, fake_comments, fake_links
-
+F
         db.drop_all()
         db.create_all()
 

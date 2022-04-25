@@ -12,10 +12,10 @@ from sqlalchemy.exc import IntegrityError
 
 from bluelog.extensions import db
 from bluelog.models import Admin, Category, Post, Comment, Link
-
+# 存储虚拟数据生成函数
 fake = Faker()
 
-
+#生成虚拟管理员信息
 def fake_admin():
     admin = Admin(
         username='admin',
@@ -28,7 +28,7 @@ def fake_admin():
     db.session.add(admin)
     db.session.commit()
 
-
+# 虚拟分类
 def fake_categories(count=10):
     category = Category(name='Default')
     db.session.add(category)
@@ -36,9 +36,9 @@ def fake_categories(count=10):
     for i in range(count):
         category = Category(name=fake.word())
         db.session.add(category)
-        try:
+        try: # 随机生成的分类名重复了try捕捉异常
             db.session.commit()
-        except IntegrityError:
+        except IntegrityError: # 发生异常 rollback
             db.session.rollback()
 
 
@@ -47,6 +47,7 @@ def fake_posts(count=50):
         post = Post(
             title=fake.sentence(),
             body=fake.text(2000),
+            # 每篇文章指定一个随机分类 get获取 传入分类数量随机值
             category=Category.query.get(random.randint(1, Category.query.count())),
             timestamp=fake.date_time_this_year()
         )
@@ -77,7 +78,7 @@ def fake_comments(count=500):
             site=fake.url(),
             body=fake.sentence(),
             timestamp=fake.date_time_this_year(),
-            reviewed=False,
+            reviewed=False,# 未审核
             post=Post.query.get(random.randint(1, Post.query.count()))
         )
         db.session.add(comment)

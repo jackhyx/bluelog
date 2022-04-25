@@ -13,11 +13,11 @@ from wtforms.validators import DataRequired, Email, Length, Optional, URL
 
 from bluelog.models import Category
 
-
+# 登录表单
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(1, 20)])
-    password = PasswordField('Password', validators=[DataRequired(), Length(1, 128)])
-    remember = BooleanField('Remember me')
+    password = PasswordField('Password', validators=[DataRequired(), Length(1, 128)])# 黑色圆点显示密码
+    remember = BooleanField('Remember me') # 复选框字段
     submit = SubmitField('Log in')
 
 
@@ -28,19 +28,19 @@ class SettingForm(FlaskForm):
     about = CKEditorField('About Page', validators=[DataRequired()])
     submit = SubmitField()
 
-
+# 文章表单
 class PostForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired(), Length(1, 60)])
     category = SelectField('Category', coerce=int, default=1)
     body = CKEditorField('Body', validators=[DataRequired()])
     submit = SubmitField()
-
+# 构造函数
     def __init__(self, *args, **kwargs):
         super(PostForm, self).__init__(*args, **kwargs)
         self.category.choices = [(category.id, category.name)
                                  for category in Category.query.order_by(Category.name).all()]
 
-
+# 分类表单
 class CategoryForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired(), Length(1, 30)])
     submit = SubmitField()
@@ -53,6 +53,7 @@ class CategoryForm(FlaskForm):
 class CommentForm(FlaskForm):
     author = StringField('Name', validators=[DataRequired(), Length(1, 30)])
     email = StringField('Email', validators=[DataRequired(), Email(), Length(1, 254)])
+    # optional 使字段可以为空
     site = StringField('Site', validators=[Optional(), URL(), Length(0, 255)])
     body = TextAreaField('Comment', validators=[DataRequired()])
     submit = SubmitField()

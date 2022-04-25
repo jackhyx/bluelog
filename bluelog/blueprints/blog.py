@@ -13,12 +13,16 @@ from bluelog.extensions import db
 from bluelog.forms import CommentForm, AdminCommentForm
 from bluelog.models import Post, Category, Comment
 from bluelog.utils import redirect_back
-
+# 实例化 ： 不仅仅是对视图函数分类，将程序某一部分的所有操作组织在一起；
+# 不仅在代码层面上的组织程序，还可以在程序层面上定义属性，为蓝本设置子域名
+# _bp后缀区分蓝本对象，避免潜在的命名冲突
+# 参数1：蓝本名称 参数2：包或模块的名称
 blog_bp = Blueprint('blog', __name__)
 
 
 @blog_bp.route('/')
 def index():
+    #
     page = request.args.get('page', 1, type=int)
     per_page = current_app.config['BLUELOG_POST_PER_PAGE']
     pagination = Post.query.order_by(Post.timestamp.desc()).paginate(page, per_page=per_page)
