@@ -41,6 +41,7 @@
             </tr>
             </thead>
             {% for comment in comments %}
+            # 评论审核 table-warning橙色背景
                 <tr {% if not comment.reviewed %}class="table-warning" {% endif %}>
                     <td>{{ loop.index + ((pagination.page - 1) * config['BLUELOG_COMMENT_PER_PAGE']) }}</td>
                     <td>

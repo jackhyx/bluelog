@@ -110,6 +110,9 @@ def register_template_context(app):
         admin = Admin.query.first() #order_by() 排序
         categories = Category.query.order_by(Category.name).all()
         links = Link.query.order_by(Link.name).all()
+        # 并未实时的；从客户端发送请求到服务器，没法随时发送浏览器
+        # TIPS：轮询模拟服务器推送
+
         if current_user.is_authenticated:
             unread_comments = Comment.query.filter_by(reviewed=False).count()
         else:
@@ -132,6 +135,8 @@ def register_errors(app):
     def internal_server_error(e):
         return render_template('errors/500.html'), 500
 
+    # 错误处理：捕获CSRFError
+    # description=e.description 获得内置错误消息 传入400.html模板
     @app.errorhandler(CSRFError)
     def handle_csrf_error(e):
         return render_template('errors/400.html', description=e.description), 400
@@ -152,8 +157,12 @@ def register_commands(app):
 
     @app.cli.command()
     @click.option('--username', prompt=True, help='The username used to login.')
+    # prompt=True 默认使用选项值的首字母大写形式作为提示字符
+    # hide_input=True 隐藏内容
+    #  confirmation_prompt=True二次确认
     @click.option('--password', prompt=True, hide_input=True,
                   confirmation_prompt=True, help='The password used to login.')
+    # 命令：创建管理员账户
     def init(username, password):
         """Building Bluelog, just for you."""
 
@@ -162,10 +171,11 @@ def register_commands(app):
 
         admin = Admin.query.first()
         if admin is not None:
+            # 已有管理员记录就更新用户名和密码
             click.echo('The administrator already exists, updating...')
             admin.username = username
             admin.set_password(password)
-        else:
+        else: # 创建新的管理员记录
             click.echo('Creating the temporary administrator account...')
             admin = Admin(
                 username=username,

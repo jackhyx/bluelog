@@ -27,10 +27,11 @@ def login():
         remember = form.remember.data
         admin = Admin.query.first()
         if admin:
+            # 验证用户名和密码
             if username == admin.username and admin.validate_password(password):
-                login_user(admin, remember)
+                login_user(admin, remember) # 登入用户
                 flash('Welcome back.', 'info')
-                return redirect_back()
+                return redirect_back() # 返回上一个页面
             flash('Invalid username or password.', 'warning')
         else:
             flash('No account.', 'warning')
@@ -38,7 +39,7 @@ def login():
 
 
 @auth_bp.route('/logout')
-@login_required
+@login_required# 视图保护
 def logout():
     logout_user()
     flash('Logout success.', 'info')

@@ -23,9 +23,23 @@ class Admin(db.Model, UserMixin):
     name = db.Column(db.String(30))
     about = db.Column(db.Text)
 
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
 
+    """
+    创建只写属性来实现密码
+    @property
+    def password(self):
+        raise AttributeError(u'该属性不可读')
+    
+    @password.setter
+    def password(self, password):
+        self.password_hash = generate_password_hash(password)
+    
+    """
+    def set_password(self, password):
+        # 设置密码 接受密码原始值作为参数
+        # 密码散列值设为password_hash的值
+        self.password_hash = generate_password_hash(password)
+        # 验证密码是否与对应的散列值相符 返回bool
     def validate_password(self, password):
         return check_password_hash(self.password_hash, password)
 

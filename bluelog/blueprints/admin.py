@@ -50,6 +50,7 @@ def manage_post():
 
 @admin_bp.route('/post/new', methods=['GET', 'POST'])
 @login_required
+# 创建文章
 def new_post():
     form = PostForm()
     if form.validate_on_submit():
@@ -71,17 +72,17 @@ def new_post():
 @login_required
 def edit_post(post_id):
     form = PostForm()
-    post = Post.query.get_or_404(post_id)
-    if form.validate_on_submit():
+    post = Post.query.get_or_404(post_id) # 从数据库获取指定id的文章
+    if form.validate_on_submit(): # POST 更新文章记录的数据
         post.title = form.title.data
         post.body = form.body.data
         post.category = Category.query.get(form.category.data)
         db.session.commit()
         flash('Post updated.', 'success')
         return redirect(url_for('blog.show_post', post_id=post.id))
-    form.title.data = post.title
-    form.body.data = post.body
-    form.category.data = post.category_id
+    form.title.data = post.title # 预定义表单的title字段值
+    form.body.data = post.body  # 预定义表单的body字段值
+    form.category.data = post.category_id # GET 使用文章数据作为表单数据 渲染模板
     return render_template('admin/edit_post.html', form=form)
 
 
@@ -129,9 +130,10 @@ def manage_comment():
 
 @admin_bp.route('/comment/<int:comment_id>/approve', methods=['POST'])
 @login_required
+# 仅POST
 def approve_comment(comment_id):
     comment = Comment.query.get_or_404(comment_id)
-    comment.reviewed = True
+    comment.reviewed = True # 通过审核
     db.session.commit()
     flash('Comment published.', 'success')
     return redirect_back()
@@ -189,10 +191,20 @@ def edit_category(category_id):
 @login_required
 def delete_category(category_id):
     category = Category.query.get_or_404(category_id)
-    if category.id == 1:
+    if category.id == 1: 如果时默认分类 id == 1返回错误
         flash('You can not delete the default category.', 'warning')
         return redirect(url_for('blog.index'))
-    category.delete()
+"""
+    将被删除分类的文章设为默认分类，然后删除
+    def delete(self):
+        default_category = Category.query.get(1) 获取默认分类
+        posts = self.posts[:]
+        for post in posts:
+            post.category = default_category 
+        db.session.delete(self)
+        db.session.commit()
+"""
+    category.delete() #调用category对象的delete()方法删除分类
     flash('Category deleted.', 'success')
     return redirect(url_for('.manage_category'))
 

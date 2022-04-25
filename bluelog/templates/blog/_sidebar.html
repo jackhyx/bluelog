@@ -33,6 +33,7 @@
         Change Theme
     </button>
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        # 渲染下拉选项 URL指向change_theme端点 theme_name 主题值
         {% for theme_name, display_name in config.BLUELOG_THEMES.items() %}
             <a class="dropdown-item"
                href="{{ url_for('blog.change_theme', theme_name=theme_name, next=request.full_path) }}">

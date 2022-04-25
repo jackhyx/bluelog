@@ -41,6 +41,7 @@ class BaseConfig(object):
     BLUELOG_MANAGE_POST_PER_PAGE = 15
     BLUELOG_COMMENT_PER_PAGE = 15
     # ('theme name', 'display name')
+    # 主题名称
     BLUELOG_THEMES = {'perfect_blue': 'Perfect Blue', 'black_swan': 'Black Swan'}
     BLUELOG_SLOW_QUERY_THRESHOLD = 1
 

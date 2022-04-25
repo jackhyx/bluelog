@@ -26,6 +26,7 @@
     </thead>
     {% for post in posts %}
     <tr>
+        # 每一页文章记录 1 - 15 重复
         <td>{{ loop.index + ((page - 1) * config.BLUELOG_MANAGE_POST_PER_PAGE) }}</td>
         <td><a href="{{ url_for('blog.show_post', post_id=post.id) }}">{{ post.title }}</a></td>
         <td><a href="{{ url_for('blog.show_category', category_id=post.category.id) }}">{{ post.category.name }}</a>
@@ -34,6 +35,7 @@
         <td><a href="{{ url_for('blog.show_post', post_id=post.id) }}#comments">{{ post.comments|length }}</a></td>
         <td>{{ post.body|striptags|length }}</td>
         <td>
+            # name="csrf_token 避免CSRF攻击
             <form class="inline" method="post"
                   action="{{ url_for('.set_comment', post_id=post.id, next=request.full_path) }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
@@ -45,6 +47,7 @@
             <form class="inline" method="post"
                   action="{{ url_for('.delete_post', post_id=post.id, next=request.full_path) }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                # onclick="return confirm('Are you sure?') 删除确认弹窗
                 <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?');">Delete
                 </button>
             </form>

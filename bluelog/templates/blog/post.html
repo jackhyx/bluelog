@@ -103,8 +103,10 @@
                                     <a class="btn btn-light btn-sm" # 回复按钮
                                        href="{{ url_for('.reply_comment', comment_id=comment.id) }}">Reply</a>
                                     {% if current_user.is_authenticated %}
+                                    # 用户管理员 显示除了管理员发表的评论以外的评论者邮箱 渲染成mailito链接
                                         <a class="btn btn-light btn-sm" href="mailto:{{ comment.email }}">Email</a>
                                         <form class="inline" method="post"
+                                              # 删除评论url附加next 重定向回到上一个界面
                                               action="{{ url_for('admin.delete_comment', comment_id=comment.id, next=request.full_path) }}">
                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                             <button type="submit" class="btn btn-danger btn-sm"
@@ -135,9 +137,11 @@
             {% endif %}
             {% if post.can_comment %}
                 <div id="comment-form">
+                    # action属性指定表单提交的目标URL
+                    # request.full_path 获取不包含URL片段的当前URL
                     {{ render_form(form, action=request.full_path) }}
                 </div>
-            {% else %}
+            {% else %} # 关了评论 相应提示
                 <div class="tip"><h5>Comment disabled.</h5></div>
             {% endif %}
         </div>

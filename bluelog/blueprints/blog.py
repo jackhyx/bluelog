@@ -93,11 +93,15 @@ def show_post(post_id):
         comment = Comment(
             author=author, email=email, site=site, body=body,
             from_admin=from_admin, post=post, reviewed=reviewed)
+
         replied_id = request.args.get('reply')
+        # 如果URL中reply查询参数存在，说明是回复
         if replied_id:
             replied_comment = Comment.query.get_or_404(replied_id)
             comment.replied = replied_comment
+        # 发送邮件给被回复用户
             send_new_reply_email(replied_comment)
+        # 提交数据库
         db.session.add(comment)
         db.session.commit()
         # 根据登录状态显示不同的提示消息
@@ -128,12 +132,15 @@ def reply_comment(comment_id):
         # 任何多余的关键字参数都会被自动转换为查询字符串
         url_for('.show_post', post_id=comment.post_id, reply=comment_id, author=comment.author) + '#comment-form')
 
-
+# 将主题名称保存到名为theme的cookie中
 @blog_bp.route('/change-theme/<theme_name>')
 def change_theme(theme_name):
+    # 确保URL变量中的主题名称在支持的范围内
+    # 出错返回404
     if theme_name not in current_app.config['BLUELOG_THEMES'].keys():
         abort(404)
 
     response = make_response(redirect_back())
+    #设置cookie max_age：过期时间
     response.set_cookie('theme', theme_name, max_age=30 * 24 * 60 * 60)
     return response
