@@ -40,7 +40,7 @@ class PostForm(FlaskForm):
         self.category.choices = [(category.id, category.name)
                                  for category in Category.query.order_by(Category.name).all()]
 
-# 分类表单
+# 分类表单11
 class CategoryForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired(), Length(1, 30)])
     submit = SubmitField()
