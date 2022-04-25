@@ -46,8 +46,8 @@ def about():
 
 
 @blog_bp.route('/category/<int:category_id>')
-def show_category(category_id):
-    category = Category.query.get_or_404(category_id)
+def show_category(category_id): # 显示分类文章列表
+    category = Category.query.get_or_404(category_id) # 获取对应分类记录
     page = request.args.get('page', 1, type=int)
     per_page = current_app.config['BLUELOG_POST_PER_PAGE']
     pagination = Post.query.with_parent(category).order_by(Post.timestamp.desc()).paginate(page, per_page)
@@ -57,25 +57,34 @@ def show_category(category_id):
 
 @blog_bp.route('/post/<int:post_id>', methods=['GET', 'POST'])
 def show_post(post_id):
-    post = Post.query.get_or_404(post_id)
+    post = Post.query.get_or_404(post_id) # 获取对应文章
     page = request.args.get('page', 1, type=int)
     per_page = current_app.config['BLUELOG_COMMENT_PER_PAGE']
+    # Comment.query.with_parent(post) 获取文章所属评论；同时排序和分页
+    # filter_by(reviewed=True) 筛选通过审核的评论记录
     pagination = Comment.query.with_parent(post).filter_by(reviewed=True).order_by(Comment.timestamp.asc()).paginate(
         page, per_page)
     comments = pagination.items
-
+    # 验证和保存
+    # 如果当前用户已登录，使用管理员表单
+    # current_user.is_authenticated Flask-Login导入 bool值代表当前用户的登录状态
     if current_user.is_authenticated:
         form = AdminCommentForm()
+
         form.author.data = current_user.name
         form.email.data = current_app.config['BLUELOG_EMAIL']
         form.site.data = url_for('.index')
+
         from_admin = True
         reviewed = True
+
     else:
+    # 未登录使用普通表单
         form = CommentForm()
         from_admin = False
         reviewed = False
 
+    # 获取数据并保存
     if form.validate_on_submit():
         author = form.author.data
         email = form.email.data
@@ -91,11 +100,14 @@ def show_post(post_id):
             send_new_reply_email(replied_comment)
         db.session.add(comment)
         db.session.commit()
+        # 根据登录状态显示不同的提示消息
         if current_user.is_authenticated:  # send message based on authentication status
             flash('Comment published.', 'success')
+
         else:
             flash('Thanks, your comment will be published after reviewed.', 'info')
-            send_new_comment_email(post)  # send notification email to admin
+            # 向管理员发送提醒邮件，传入post
+            send_new_comment_email(post)
         return redirect(url_for('.show_post', post_id=post_id))
     return render_template('blog/post.html', post=post, pagination=pagination, form=form, comments=comments)
 

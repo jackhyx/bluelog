@@ -10,6 +10,8 @@
     </div>
     <div class="row">
         <div class="col-sm-8">
+            # include 替换渲染文章列表的代码
+            #注意路径；所有的路径都是相对于templates文件夹根目录的
             {% include 'blog/_posts.html' %}
             {% if posts %} # if 判断确保有文章时显示分页导航部件
             # render_pagination 宏：渲染分页导航部件

@@ -30,7 +30,7 @@
             {{ post.body|safe }} #safe 过滤器让jinja2把文本当作html渲染
             <hr>
             <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target=".postLinkModal">Share
-            </button>
+            </button> # 分享按钮 打开包含文章固定链接的模态框l
             <div class="modal fade postLinkModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
                  aria-hidden="true">
                 <div class="modal-dialog">
@@ -44,6 +44,7 @@
                         <div class="modal-body">
                             <div class="form-group">
                                 <input type="text" class="form-control"
+                                       # 文章固定链接有url_for生成 默认相对；_external=True 生成绝对URL
                                        value="{{ url_for('.show_post', post_id=post.id, _external=True) }}" readonly>
                             </div>
                         </div>
@@ -54,7 +55,7 @@
                 <h3>{{ pagination.total }} Comments
                     <small>
                         <a href="{{ url_for('.show_post', post_id=post.id, page=pagination.pages or 1) }}#comments">
-                            latest</a>
+                            latest</a> # 指向最新评论
                     </small>
                     {% if current_user.is_authenticated %}
                         <form class="float-right" method="post"
@@ -89,11 +90,14 @@
                                         {{ moment(comment.timestamp).fromNow() }}
                                     </small>
                                 </div>
+                                # 通过replied是否为空判断评论是否为回复 如果是，则显示一个回复标记
+                                # 获取评论内容和作者
                                 {% if comment.replied %}
                                     <p class="alert alert-dark reply-body">{{ comment.replied.author }}:
                                         <br>{{ comment.replied.body }}
                                     </p>
                                 {%- endif -%}
+
                                 <p class="mb-1">{{ comment.body }}</p>
                                 <div class="float-right">
                                     <a class="btn btn-light btn-sm"
@@ -117,6 +121,7 @@
                 {% endif %}
             </div>
             {% if comments %}
+            # fragment: 分页按钮的链接中添加URL片段->单击后跳到页面的评论部分；
                 {{ render_pagination(pagination, fragment='#comments') }}
             {% endif %}
             {% if request.args.get('reply') %}
