@@ -22,11 +22,21 @@ blog_bp = Blueprint('blog', __name__)
 
 @blog_bp.route('/')
 def index():
-    #
+    # 从查询字符串获取当前页数从request.args中获取；没有设置则默认值1，指定int类型保证在参数类型错误时使用默认值；
     page = request.args.get('page', 1, type=int)
+    # 每页数量 从配置变量获取方便统一修改
     per_page = current_app.config['BLUELOG_POST_PER_PAGE']
+    # 分页对象 为了实现分页 把查询执行函数all()换成paginate()
+    # page:返回那一页记录 peri_page: 把记录分成几页
+    # def paginate(self, page=None, per_page=None, error_out=True, max_per_page=None)
+    # error_out:当前查询页数超出行为：True 页面超过最大值，page/per_page为负数或者非整型数返回404；False返回空记录
+    # max_per_page 每页数量最大值
+    # 如果没有page 和 per_page Flask-SQLAlchemy 自动获取 默认 1 20
     pagination = Post.query.order_by(Post.timestamp.desc()).paginate(page, per_page=per_page)
-    posts = pagination.items
+    # pagination实例：分页对象->包含分页信息 调用items属性以列表形式返回对应页数（默认1）的记录
+    # 类属性 has_next 如果存在下一页，返回True has_prev如果存在上一页 返回True
+    # 可以在html中通过此状态渲染按钮状态
+    posts = pagination.items # 当前页数的记录列表
     return render_template('blog/index.html', pagination=pagination, posts=posts)
 
 
